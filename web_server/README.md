@@ -1,1 +1,1 @@
-Web Server
+configuration of domain and webserver
