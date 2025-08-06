@@ -10,3 +10,4 @@ host="$3@$2:~/"
 
 # Transfer the file using scp
 scp -o StrictHostKeyChecking=no -i "$4" "$1" "$host"
+
