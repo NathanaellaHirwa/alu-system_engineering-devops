@@ -1,32 +1,30 @@
 #!/usr/bin/env bash
-# Configures Nginx to redirect /redirect_me with a 301 permanent redirect
+# Installs, configures, and starts the server
+apt-get update
+apt-get -y install nginx
+sudo ufw allow 'Nginx HTTP'
+mkdir -p /var/www/html/
+sudo chmod -R 755 /var/www
+echo 'Hello World!' > /var/www/html/index.html
+SERVER_CONFIG=\
+"server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	root /var/www/html;
+	index index.html index.htm index.nginx-debian.html;
+	server_name _;
+	location / {
+		try_files \$uri \$uri/ =404;
+	}
+	if (\$request_filename ~ redirect_me){
+		rewrite ^ https://sketchfab.com/bluepeno/models permanent;
+	}
+}"
 
-# Update package list and install Nginx if not already installed
-sudo apt-get update -q
-sudo apt-get install -y nginx
+bash -c "echo -e '$SERVER_CONFIG' > /etc/nginx/sites-enabled/default"
 
-# Create Nginx configuration for the redirect
-sudo tee /etc/nginx/sites-available/redirect > /dev/null <<EOF
-server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    server_name _;
-
-    location = /redirect_me {
-        return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;
-    }
-
-    location / {
-        try_files \$uri \$uri/ =404;
-    }
-}
-EOF
-
-# Enable the configuration
-sudo ln -sf /etc/nginx/sites-available/redirect /etc/nginx/sites-enabled/
-
-# Remove default configuration to avoid conflicts
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test configuration and restart Nginx
-sudo nginx -t && sudo systemctl restart nginx
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+	service nginx start
+else
+	service nginx restart
+fi
