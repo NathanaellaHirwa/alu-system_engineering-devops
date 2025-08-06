@@ -1,18 +1,6 @@
 #!/usr/bin/env bash
-# Installs nginx and serves a custom page with "Holberton School for the win!"
-
-# Exit immediately if any command fails
-set -e
-
-# Update packages and upgrade
-sudo apt-get update -y && sudo apt-get upgrade -y
-
-# Install nginx
-sudo apt-get install -y nginx
-
-# Replace the default index.html
-echo "Holberton School for the win!" | sudo tee /var/www/html/index.html > /dev/null
-
-# Start nginx using service (not systemctl)
-sudo service nginx start
-
+# installs the reverse proxy - Nginx
+sudo apt update && upgrade
+sudo apt install nginx -y 
+echo "Holberton School" | sudo tee /var/www/html/index.html
+sudo service nginx restart
